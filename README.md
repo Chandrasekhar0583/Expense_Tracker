@@ -1,246 +1,387 @@
 # 💰 Expense Tracker REST API
 
-A clean, production-ready **Expense Tracker REST API** built to manage, filter, sort, and analyze personal expenses.  
-This project demonstrates **RESTful design, database modeling, query filtering, sorting, aggregation, and error handling**, aligned with real-world backend requirements.
+A clean, production-ready Expense Tracker REST API built with Spring Boot to manage, filter, sort, and analyze personal expenses.
+
+## 📋 Table of Contents
+
+- [Problem Statement](#-problem-statement)
+- [Features](#-features)
+- [Architecture](#-architecture)
+- [Tech Stack](#-tech-stack)
+- [Data Model](#-data-model)
+- [API Endpoints](#-api-endpoints)
+- [Getting Started](#-getting-started)
+- [Usage Examples](#-usage-examples)
+- [Error Handling](#-error-handling)
+- [Learning Outcomes](#-learning-outcomes)
+- [Contributing](#-contributing)
+- [Author](#-author)
 
 ---
 
-## 🧩 Problem Statement
+## 🎯 Problem Statement
 
 Build a REST API that allows users to:
-- Record daily expenses
-- Filter and sort expenses using query parameters
-- Generate meaningful summaries such as **category-wise** and **monthly** spending
+- Record daily expenses with detailed information
+- Filter and sort expenses using flexible query parameters
+- Generate meaningful summaries such as category-wise and monthly spending analytics
 
-This task focuses on **data-driven backend development**, not just CRUD.
-
----
-
-## 🏗️ Architecture Overview
-
-```
-Client (Postman / Browser / Frontend)
-        │
-        ▼
-Expense Tracker REST API
-        │
-        ▼
-Relational Database (MySQL / PostgreSQL / SQLite)
-```
+This project focuses on **data-driven backend development**, demonstrating advanced filtering, sorting, and aggregation capabilities beyond simple CRUD operations.
 
 ---
 
-## ✨ Features Implemented
+## ✨ Features
 
-✔ Full CRUD operations on expenses  
-✔ Advanced filtering by date, category, and amount  
-✔ Sorting by date or amount (asc / desc)  
-✔ Category-wise spending summary  
-✔ Monthly spending summary  
-✔ Input validation & proper HTTP status codes  
-✔ Clean modular backend structure
+- ✅ **Full CRUD Operations** - Create, Read, Update, Delete expenses
+- 🔍 **Advanced Filtering** - Filter by date range, category, and amount
+- 🔄 **Flexible Sorting** - Sort by date or amount (ascending/descending)
+- 📊 **Category-wise Summary** - Analyze spending by category
+- 📅 **Monthly Summary** - Track expenses month-by-month
+- ✔️ **Input Validation** - Proper validation with meaningful error messages
+- 🏗️ **Clean Architecture** - Modular and maintainable code structure
+
+---
+
+## 🏛️ Architecture
+
+```
+┌─────────────────────────────────┐
+│  Client (Postman/Browser/App)  │
+└────────────┬────────────────────┘
+             │
+             ▼
+┌─────────────────────────────────┐
+│  Expense Tracker REST API       │
+│  (Spring Boot)                  │
+└────────────┬────────────────────┘
+             │
+             ▼
+┌─────────────────────────────────┐
+│  MySQL Database                 │
+└─────────────────────────────────┘
+```
+
+---
+
+## 🛠️ Tech Stack
+
+| Technology | Purpose |
+|------------|---------|
+| **Java 21** | Programming Language |
+| **Spring Boot 3.x** | Application Framework |
+| **Spring Data JPA** | Data Access Layer |
+| **Hibernate** | ORM Framework |
+| **MySQL** | Database |
+| **Maven** | Build Tool |
+| **REST API** | API Design Pattern |
 
 ---
 
 ## 📊 Data Model
 
 ### Expense Entity
+
 | Field | Type | Description |
-|------|-----|-------------|
-| id | Long / UUID | Unique expense identifier |
-| amount | Decimal | Expense amount |
-| category | Enum | food, transport, entertainment, bills, shopping, other |
-| date | Date | Expense date |
+|-------|------|-------------|
+| `id` | Long | Unique expense identifier (Primary Key) |
+| `amount` | Double | Expense amount (must be positive) |
+| `category` | Enum | FOOD, TRANSPORT, ENTERTAINMENT, BILLS, SHOPPING, OTHER |
+| `date` | LocalDate | Expense date (YYYY-MM-DD) |
+| `description` | String | Optional description/note |
 
 ---
 
-## 📡 API Endpoints
+## 🔌 API Endpoints
 
 ### 1️⃣ Create Expense
-```
-POST /expenses
-```
 
-**Request Body**
-```json
+```http
+POST /expenses
+Content-Type: application/json
+
 {
   "amount": 250.50,
-  "category": "food",
-  "date": "2025-01-10"
+  "category": "FOOD",
+  "date": "2025-01-10",
+  "description": "Lunch at restaurant"
 }
 ```
 
-**Response** `201 Created`
+**Response: `201 Created`**
 ```json
 {
   "id": 1,
   "amount": 250.50,
-  "category": "food",
-  "date": "2025-01-10"
+  "category": "FOOD",
+  "date": "2025-01-10",
+  "description": "Lunch at restaurant"
 }
 ```
 
 ---
 
 ### 2️⃣ Get Expense by ID
-```
+
+```http
 GET /expenses/{id}
 ```
 
-**Response** `200 OK`
+**Response: `200 OK`**
 ```json
 {
   "id": 1,
   "amount": 250.50,
-  "category": "food",
-  "date": "2025-01-10"
+  "category": "FOOD",
+  "date": "2025-01-10",
+  "description": "Lunch at restaurant"
 }
 ```
 
-**If not found** → `404 Not Found`
+**Error: `404 Not Found`**
+```json
+{
+  "error": "Expense not found with id: 5"
+}
+```
 
 ---
 
 ### 3️⃣ Update Expense
-```
-PUT /expenses/{id}
-```
 
-**Request Body**
-```json
+```http
+PUT /expenses/{id}
+Content-Type: application/json
+
 {
-  "amount": 300,
-  "category": "transport",
-  "date": "2025-01-11"
+  "amount": 300.00,
+  "category": "TRANSPORT",
+  "date": "2025-01-11",
+  "description": "Bus fare"
 }
 ```
+
+**Response: `200 OK`** (Updated expense object)
 
 ---
 
 ### 4️⃣ Delete Expense
-```
+
+```http
 DELETE /expenses/{id}
 ```
 
-**Response** → `204 No Content`
+**Response: `204 No Content`**
 
 ---
 
-## 🔍 Filtering & Sorting
+### 5️⃣ Get All Expenses with Filtering & Sorting
 
-### Retrieve Expenses with Filters
-```
-GET /expenses
+```http
+GET /expenses?category=FOOD&minAmount=100&sortBy=amount&order=desc
 ```
 
-**Supported Query Parameters**
-| Parameter | Description |
-|---------|------------|
-| start_date | Filter by start date |
-| end_date | Filter by end date |
-| category | Filter by category |
-| min_amount | Minimum amount |
-| max_amount | Maximum amount |
-| sort_by | date or amount |
-| order | asc or desc |
+#### Query Parameters
 
-**Example**
-```
-GET /expenses?category=food&min_amount=100&sort_by=amount&order=desc
+| Parameter | Type | Description | Example |
+|-----------|------|-------------|---------|
+| `startDate` | String | Filter by start date | `2025-01-01` |
+| `endDate` | String | Filter by end date | `2025-01-31` |
+| `category` | String | Filter by category | `FOOD` |
+| `minAmount` | Double | Minimum amount | `100.0` |
+| `maxAmount` | Double | Maximum amount | `1000.0` |
+| `sortBy` | String | Sort field (`date` or `amount`) | `amount` |
+| `order` | String | Sort order (`asc` or `desc`) | `desc` |
+
+**Example Response: `200 OK`**
+```json
+[
+  {
+    "id": 3,
+    "amount": 450.00,
+    "category": "FOOD",
+    "date": "2025-01-15",
+    "description": "Dinner"
+  },
+  {
+    "id": 1,
+    "amount": 250.50,
+    "category": "FOOD",
+    "date": "2025-01-10",
+    "description": "Lunch"
+  }
+]
 ```
 
 ---
 
-## 📈 Aggregation Endpoints
+### 6️⃣ Category-wise Summary
 
-### Category-wise Summary
-```
+```http
 GET /expenses/summary/by-category
 ```
 
-**Response**
+**Response: `200 OK`**
 ```json
 {
-  "food": 550.75,
-  "transport": 120.50,
-  "shopping": 300
+  "FOOD": 550.75,
+  "TRANSPORT": 120.50,
+  "SHOPPING": 300.00,
+  "BILLS": 450.00
 }
 ```
 
 ---
 
-### Monthly Summary (Current Year)
-```
+### 7️⃣ Monthly Summary (Current Year)
+
+```http
 GET /expenses/summary/monthly
 ```
 
-**Response**
+**Response: `200 OK`**
 ```json
 {
-  "January": 1200,
-  "February": 950
+  "JANUARY": 1200.00,
+  "FEBRUARY": 950.00,
+  "MARCH": 1500.00
 }
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Java 21 or higher
+- Maven 3.6+
+- MySQL 8.0+
+- Postman (optional, for testing)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/expense-tracker-api.git
+   cd expense-tracker-api
+   ```
+
+2. **Create MySQL Database**
+   ```sql
+   CREATE DATABASE expense_tracker_db;
+   ```
+
+3. **Configure Database Connection**
+
+   Edit `src/main/resources/application.properties`:
+   ```properties
+   spring.datasource.url=jdbc:mysql://localhost:3306/expense_tracker_db
+   spring.datasource.username=root
+   spring.datasource.password=your_password
+   
+   spring.jpa.hibernate.ddl-auto=update
+   spring.jpa.show-sql=true
+   spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+   ```
+
+4. **Build the Project**
+   ```bash
+   mvn clean install
+   ```
+
+5. **Run the Application**
+   ```bash
+   mvn spring-boot:run
+   ```
+
+6. **Access the API**
+   ```
+   http://localhost:8080
+   ```
+
+---
+
+## 💡 Usage Examples
+
+### Example 1: Create and Track Daily Expenses
+
+```bash
+# Create a food expense
+curl -X POST http://localhost:8080/expenses \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 45.00,
+    "category": "FOOD",
+    "date": "2025-01-15",
+    "description": "Breakfast"
+  }'
+```
+
+### Example 2: Find All Food Expenses Over $100
+
+```bash
+curl "http://localhost:8080/expenses?category=FOOD&minAmount=100"
+```
+
+### Example 3: Get Expenses for January Sorted by Amount
+
+```bash
+curl "http://localhost:8080/expenses?startDate=2025-01-01&endDate=2025-01-31&sortBy=amount&order=desc"
+```
+
+### Example 4: Analyze Spending by Category
+
+```bash
+curl http://localhost:8080/expenses/summary/by-category
 ```
 
 ---
 
 ## ⚠️ Error Handling
 
-| Scenario | Status | Example |
-|-------|-------|--------|
-| Invalid date | 400 | `{"error": "Invalid date format"}` |
-| Negative amount | 400 | `{"error": "Amount must be positive"}` |
-| Not found | 404 | `{"error": "Expense not found"}` |
+The API returns appropriate HTTP status codes and error messages:
+
+| Status Code | Description | Example Response |
+|-------------|-------------|------------------|
+| `400 Bad Request` | Validation error or invalid input | `{"amount": "Amount must be positive"}` |
+| `404 Not Found` | Resource not found | `{"error": "Expense not found with id: 5"}` |
+| `500 Internal Server Error` | Server error | `{"error": "Internal Server Error"}` |
 
 ---
 
-## 🛠️ Tech Stack
+## 📚 Learning Outcomes
 
-- **Java / Spring Boot** (API layer)
-- **JPA / JDBC** (data access)
-- **MySQL / PostgreSQL / SQLite** (database)
-- **RESTful API principles**
+This project demonstrates:
 
----
-
-## 🚀 How to Run
-
-### 1️⃣ Configure Database
-Update application properties:
-```
-spring.datasource.url=jdbc:mysql://localhost:3306/expense_db
-spring.datasource.username=root
-spring.datasource.password=password
-```
-
-### 2️⃣ Run Application
-```
-mvn spring-boot:run
-```
-
-API will be available at:
-```
-http://localhost:8080
-```
+- ✅ Designing RESTful APIs beyond basic CRUD operations
+- ✅ Implementing complex filtering and sorting with query parameters
+- ✅ Writing efficient aggregation queries using SQL GROUP BY and SUM
+- ✅ Handling invalid input gracefully with proper validation
+- ✅ Structuring clean, maintainable backend code
+- ✅ Following REST API best practices and conventions
 
 ---
 
-## 🎯 Learning Outcomes
+## 🤝 Contributing
 
-✔ Designing RESTful APIs beyond CRUD  
-✔ Implementing complex filtering & sorting  
-✔ Writing efficient aggregation queries  
-✔ Handling invalid input gracefully  
-✔ Structuring clean backend code
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
 ## 👤 Author
 
-**CHANDRA SEKHAR**  
-Backend Developer | API Design Enthusiast
+**CHANDRA SEKHAR**
 
----
-
-⭐ If this project helped you learn backend fundamentals, give it a star!
-
+Backend Developer | Spring Boot & REST API Enthusiast
